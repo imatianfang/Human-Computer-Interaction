@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <title>Image Search</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <!--js files-->
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/favorite.js"></script>
+
+
+    <!--css files-->
+    <link rel="stylesheet" href="css/index.css" type="text/css">
+    <link rel="stylesheet" href="css/default.css" type="text/css">
+    <link rel="stylesheet" href="css/fileinput.css" media="all" type="text/css" />
+
+</head>
+
+<body style="background: white;">
+    <div class="jumbotron" style="background:url(images/background.jpg); width:100%;">
+        <div class="container" >
+            <h1>Hello!</h1>
+            <p>Welcome to this Image Search Website!</p>
+            <p><a class="btn btn-primary btn-lg"
+                    href="https://github.com/matianfang1998/Human-Computer-Interaction/tree/main/lab2_image_retrieval"
+                    role="button">Learn more</a></p>
+        </div>
+    </div>
+
+
+    <center></center>
+
+    <!--file input-->
+
+    <div id="main" class="container">
+        <table class="table" style="background: white;border: 1px solid beige;box-shadow: 3px 5px 15px 0px rgba(0, 0, 0, 0.2), 3px 5px 15px 0 rgba(0, 0, 0, 0.19);
+">
+            <form method=post enctype="multipart/form-data">
+                <div class="form-group">
+                    <input id="file-1" type="file" class="file" data-overwrite-initial="false" required>
+                    <br>
+                    <div class="alert"></div>
+                    <div class="text-center">
+                        <button type="submit" id="search-btn" class="btn btn-primary btn-lg" onclick="search()">Search</button>
+                        <button type="button" class="btn btn-default btn-lg"> Reset </button>
+                    </div>
+                </div>
+            </form>
+        </table>
+    </div>
+
+    <!--loading-->
+    <center>
+        <img id="load" src="/images/ajax-loader.gif" style="height:100px;weight:100px;display:none;">
+    </center>
+
+    <hr style="filter: alpha(opacity=100,finishopacity=0,style=3);margin-bottom: 40px;" width="90%" color="#6f5499"
+        size="3" />
+
+
+    <div id="main" class="container" data-target="#myScrollspy">
+        <!--search result-->
+        <div id="search-result" class="panel panel-default">
+            <div class="panel-heading">
+                <p>
+                    <label>Search Result</label>
+                    <span id="search-result-info-label" style="display:none">
+                        <span>Get </span> <span id="num-of-search-result">9</span> <span> results in </span> <span
+                            id="time-of-search-result">1000</span> <span>ms</span>
+                    </span>
+
+                </p>
+                <!--sort-->
+                <div id="tag-dropdown" class="dropdown" style="display:none">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Sort By
+                        <span class="caret"></span>
+                    </button>
+                    <ul id="tag-sort-menu" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <div id="table" class="table" style="background: white; border: 1px ;display:none;">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box0" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img0" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-0">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg0" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg0-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg0-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box1" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img1" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-1">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg1" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg1-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg1-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box2" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img2" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-2">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg2" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg2-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg2-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box3" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img3" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-3">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg3" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg3-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg3-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box4" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img4" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-4">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg4" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg4-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg4-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box5" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img5" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-5">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg5" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg5-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg5-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box6" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img6" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-6">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg6" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg6-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg6-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box7" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img7" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-7">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg7" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg7-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg7-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div id="result-image-box8" class="thumbnail">
+                                <div class="result-image-border">
+                                    <img id="img8" class="result-image" src="" alt="..." width="200" height="200">
+                                </div>
+                                <div class="caption">
+                                    <p id="img-tag-8">标签</p>
+                                    <p class="text-right">
+                                        <button id="likeImg8" onclick="onClickImgLike(this)" class="btn btn-primary">
+                                            <span id="likeImg8-icon" class="glyphicon glyphicon-star-empty"></span>
+                                            <span id="likeImg8-text">收藏</span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Favorite-->
+        <div id="favorite-image" class="panel panel-default">
+            <div class="panel-heading">
+                <label>Favorite Images</label>
+            </div>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                    <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                    <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                </ol>
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" align="center">
+                        <img id="favImg0" src="favorites/favorite0.jpg" alt="First">
+                    </div>
+                    <div class="item" align="center">
+                        <img id="favImg1" src="favorites/favorite1.jpg" alt="Second">
+                    </div>
+                    <div class="item" align="center">
+                        <img id="favImg2" src="favorites/favorite2.jpg" alt="Third">
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <hr style="filter: alpha(opacity=100,finishopacity=0,style=3);margin-top: 20px;margin-bottom: 20px;" width="80%"
+        color="#6f5499" size="3" />
+
+    <!--footer-->
+    <footer class="navbar-bottom">
+        <div class="container">
+            <span style="text-align: center;display:block;margin-bottom: 20px;">Image Search</span>
+        </div>
+    </footer>
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+        crossorigin="anonymous"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/fileinput.js"></script>
+    <script type="text/javascript" src="js/fileinput_locale_zh.js"></script>
+
+    <script>
+        $("#file-1").fileinput({
+            uploadUrl: '#', // you must set a valid URL here else you will get an error
+            showUpload: false,
+            allowedFileExtensions: ['jpg', 'png', 'gif'],
+            overwriteInitial: false,
+            maxFileSize: 10000,
+            maxFilesNum: 1,
+            //allowedFileTypes: ['image', 'video', 'flash'],
+        });
+    </script>
+</body>
+
+</html>
