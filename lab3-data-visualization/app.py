@@ -1,34 +1,15 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import numpy as np
+import dash_bootstrap_components as dbc
+
 from dash.dependencies import Input, Output, State
 
-import plotly.graph_objs as go
 import plotly.express as px
-
-import pandas as pd
 
 from fileReader import *
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-# tab标签的css
-tabs_styles = {'height': '44px'}
-tab_style = {
-    'borderBottom': '1px solid #d6d6d6',
-    'padding': '6px',
-    'fontWeight': 'bold'
-}
-tab_selected_style = {
-    'borderTop': '1px solid #d6d6d6',
-    'borderBottom': '1px solid #d6d6d6',
-    'backgroundColor': '#119DFF',
-    'color': 'white',
-    'padding': '6px'
-}
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 df = pd.read_csv("dataset/black-friday/BlackFriday.csv")
 
@@ -37,89 +18,160 @@ file = read_file()
 # 获取商品分类
 product_category_1, product_category_2, product_category_3 = get_product_category_1()
 
-# 界面
-app.layout = html.Div([
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Label("Product Category1"),
-                dcc.Dropdown(
-                    id="category_1",
-                    options=[{
-                        "label": i,
-                        "value": i
-                    } for i in product_category_1],
-                    value="All",
-                ),
-                html.Label("Product Category2"),
-                dcc.Dropdown(
-                    id="category_2",
-                ),
-                html.Label("Product Category3"),
-                dcc.Dropdown(
-                    id="category_3",
-                ),
-            ],
-                style={
-                    # "border": "2px black solid"
-                }),
-            # 散点图
-            dcc.Graph(
-                id='sale-price-scatter-plot',
-            )
-        ],
-            style={
-                "width": "49%",
-                "display": "inline-block",
-            }),
-        html.Div([
-            # 柱状图
-            html.Div([
+# 导航栏
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("About",
+                                href="https://github.com/imatianfang/Human-Computer-Interaction/tree/main/lab3-data-visualization")),
+    ],
+    brand="Black Friday",
+    brand_href="",
+    sticky="top",
+)
+
+# 种类选择
+category_card = dbc.Card(
+    [
+        dbc.CardHeader("Category"),
+        dbc.CardBody(
+            [
+                html.Div([
+                    html.Label("Product Category1"),
+                    dcc.Dropdown(
+                        id="category_1",
+                        options=[{
+                            "label": i,
+                            "value": i
+                        } for i in product_category_1],
+                        value="All",
+                    ),
+                    html.Label("Product Category2"),
+                    dcc.Dropdown(
+                        id="category_2",
+                    ),
+                    html.Label("Product Category3"),
+                    dcc.Dropdown(
+                        id="category_3",
+                    ),
+                    html.Div([
+                        dbc.Button("Submit", color="primary", id="Submit-btn", n_clicks=0,
+                                   className="mr-1", style={"margin": "20px"}),
+                    ],
+                        style={"text-align": "center"})
+
+                ])
+            ]
+        ),
+    ]
+)
+
+# 散点图
+scatter_plot = dbc.Card(
+    [
+        dbc.CardHeader("sale-price-scatter-plot"),
+        dbc.CardBody(
+            [
+                # 散点图
+                dcc.Graph(
+                    id='sale-price-scatter-plot',
+                )
+            ]
+        ),
+    ]
+)
+
+# 柱状图
+bar_chart = dbc.Card(
+    [
+        dbc.CardHeader("age-sex-purchase-bar-chart"),
+        dbc.CardBody(
+            [
+                # 柱状图
                 dcc.Graph(
                     id='age-sex-purchase-bar-chart'
                 )
-            ]),
-            dcc.Tabs(
-                id="tabs",
-                style=tabs_styles,
-                children=[
-                    # tab1
-                    dcc.Tab(
-                        label="Purchase in black five of all ages",
-                        style=tab_style,
-                        selected_style=tab_selected_style,
-                        children=[
-                            html.Div([
+            ]
+        ),
+    ]
+)
+
+# 折线图-饼状图
+tabs = html.Div(
+    [
+        dbc.Tabs(
+            [
+                dbc.Tab(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
                                 dcc.Graph(
                                     id='age-purchase-pie-chart',
                                     animate=True
                                 ),
-                            ]),
-                        ]
+                            ]
+                        )
                     ),
-                    # tab2
-                    dcc.Tab(
-                        label="Residence time and purchase of each city",
-                        style=tab_style,
-                        selected_style=tab_selected_style,
-                        children=[
-                            html.Div([
-                                # 折线图
+                    label="age-purchase-pie-chart",
+                    style={"padding": "10px"},
+                ),
+                dbc.Tab(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
                                 dcc.Graph(
                                     id='city-live-sale-line-chart'
                                 )
-                            ])
-                        ]
+                            ]
+                        )
+                    ),
+                    label="city-live-time-sale-line-chart",
+                    style={"padding": "10px"},
+                ),
+            ]
+        ),
+    ]
+)
+
+# 界面
+app.layout = html.Div([
+    navbar,
+    dbc.Container(
+        [
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            category_card
+                        ],
+                        style={"width": "25%", "float": "left", "margin": "0 20px 0 0"}
+                    ),
+                    html.Div(
+                        [
+                            scatter_plot,
+                        ],
+                        style={"width": "70%", "float": "left"}
+                    )
+                ],
+                style={"width": "100%", "float": "left", "margin": "10px 0 20px 0"},
+            ),
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            bar_chart,
+                        ],
+                        style={"width": "50%", "float": "left", "margin": "0 20px 0 0"}
+                    ),
+                    html.Div(
+                        [
+                            tabs,
+                        ],
+                        style={"width": "45%", "float": "left"}
                     )
                 ]
             )
-        ],
-            style={
-                "width": "49%",
-                "float": "right",
-                "display": "inline-block"
-            })
-    ])
+        ]),
+
 ])
 
 app.title = "Black-Friday"
@@ -128,11 +180,12 @@ app.title = "Black-Friday"
 # 折线图
 @app.callback(
     Output('city-live-sale-line-chart', 'figure'),
-    Input('category_1', 'value'),
-    Input('category_2', 'value'),
-    Input('category_3', 'value')
+    Input('Submit-btn', 'n_clicks'),
+    State('category_1', 'value'),
+    State('category_2', 'value'),
+    State('category_3', 'value')
 )
-def update_city_live_sale_line_chart(category_1, category_2, category_3):
+def update_city_live_sale_line_chart(n_clicks, category_1, category_2, category_3):
     new_file = read_file()
     new_file = file_filter(new_file, category_1, category_2, category_3)
 
@@ -150,7 +203,7 @@ def update_city_live_sale_line_chart(category_1, category_2, category_3):
         "Cities": cities_for_line_chart,
     })
 
-    line_fig = px.line(line_df, x='LiveYears', y='Sales', color='Cities', title="city-live-time-sale-line-chart")
+    line_fig = px.line(line_df, x='LiveYears', y='Sales', color='Cities')
 
     return line_fig
 
@@ -158,11 +211,12 @@ def update_city_live_sale_line_chart(category_1, category_2, category_3):
 # 散点图
 @app.callback(
     Output('sale-price-scatter-plot', 'figure'),
-    Input('category_1', 'value'),
-    Input('category_2', 'value'),
-    Input('category_3', 'value')
+    Input('Submit-btn', 'n_clicks'),
+    State('category_1', 'value'),
+    State('category_2', 'value'),
+    State('category_3', 'value')
 )
-def update_sale_price_scatter_plot(category_1, category_2, category_3):
+def update_sale_price_scatter_plot(n_clicks, category_1, category_2, category_3):
     new_file = read_file()
     new_file = file_filter(new_file, category_1, category_2, category_3)
 
@@ -178,19 +232,19 @@ def update_sale_price_scatter_plot(category_1, category_2, category_3):
 
     scatter_fig = px.scatter(scatter_df, x="ProductSales", y="ProductPrice",
                              size="ProductTotal", color="ProductCategory", hover_name="ProductId",
-                             title="sale-price-scatter-plot",
-                             log_x=True, size_max=60, height=750)
+                             log_x=True)
     return scatter_fig
 
 
 # 柱状图
 @app.callback(
     Output('age-sex-purchase-bar-chart', 'figure'),
-    Input('category_1', 'value'),
-    Input('category_2', 'value'),
-    Input('category_3', 'value')
+    Input('Submit-btn', 'n_clicks'),
+    State('category_1', 'value'),
+    State('category_2', 'value'),
+    State('category_3', 'value')
 )
-def update_age_sex_purchase_bar_chart(category_1, category_2, category_3):
+def update_age_sex_purchase_bar_chart(n_clicks, category_1, category_2, category_3):
     new_file = read_file()
     new_file = file_filter(new_file, category_1, category_2, category_3)
 
@@ -207,10 +261,10 @@ def update_age_sex_purchase_bar_chart(category_1, category_2, category_3):
     bar_df = pd.DataFrame({
         "Age": content_age_category + content_age_category,
         "Purchase": x + y,
-        "Sex": sex
+        "Gender": sex
     })
 
-    bar_fig = px.bar(bar_df, x="Age", y="Purchase", color="Sex", barmode="group", title="age-sex-purchase-bar-chart")
+    bar_fig = px.bar(bar_df, x="Age", y="Purchase", color="Gender", barmode="group")
 
     return bar_fig
 
@@ -218,11 +272,12 @@ def update_age_sex_purchase_bar_chart(category_1, category_2, category_3):
 # 饼状图
 @app.callback(
     Output('age-purchase-pie-chart', 'figure'),
-    Input('category_1', 'value'),
-    Input('category_2', 'value'),
-    Input('category_3', 'value')
+    Input('Submit-btn', 'n_clicks'),
+    State('category_1', 'value'),
+    State('category_2', 'value'),
+    State('category_3', 'value')
 )
-def update_age_purchase_pie_chart(category_1, category_2, category_3):
+def update_age_purchase_pie_chart(n_clicks, category_1, category_2, category_3):
     new_file = read_file()
     new_file = file_filter(new_file, category_1, category_2, category_3)
 
@@ -235,7 +290,7 @@ def update_age_purchase_pie_chart(category_1, category_2, category_3):
         "Purchase": content_purchase_list,
     })
 
-    pie_fig = px.pie(pie_df, names="Labels", values="Purchase", title="age-purchase-pie-chart")
+    pie_fig = px.pie(pie_df, names="Labels", values="Purchase")
 
     return pie_fig
 

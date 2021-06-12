@@ -1,5 +1,4 @@
 import csv
-
 import pandas as pd
 
 content_age_category = [
